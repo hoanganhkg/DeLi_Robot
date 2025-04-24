@@ -1,0 +1,11 @@
+# Keil uVision
+*.axf
+*.d
+*.o
+*.uvoptx
+*.uvopt
+*.uvprojx.user
+Objects/
+.vs/
+*.bak
+
