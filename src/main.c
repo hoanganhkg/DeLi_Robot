@@ -16,6 +16,9 @@ uint32_t data;
 double time,dist;
 void LED_Config(void);
 extern char RxBuffer[15];
+KalmanAngle kalman_yaw;
+KalmanSpeed my_kalman_speed;
+
 int main(void)
 {	
 	PWM_Init();
@@ -26,15 +29,14 @@ int main(void)
   INCP_GPIO_config();
 	INCP_TIMER_CONFIG();
 	INCP_CONFIG();
-//	CAN_Config();
+	KalmanSpeed_Init(&my_kalman_speed, 10.0f, 0.1f);  // Q và R b?n có th? tinh ch?nh
+	CAN_Config();
 	I2C2_Init();
 	BNO055_ApplyCalibration(&calib_data);
-//	I2C_Configuration();
-//	IMU_Initialize();
-//	Timer_TransData();
+	KalmanAngle_Init(&kalman_yaw, 10.0f, 2.0f);
+	Timer_TransData();
 	Timer_Motor();
 	Timer_Control();
-//	USART6_Rx_DMA();
 	IWDG_Config();
 	
 	while(1)

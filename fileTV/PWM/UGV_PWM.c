@@ -38,19 +38,15 @@
 		#define		PWM_TIM_ClockDivision								0
 		#define		PWM_TIM_RepetitionCounter						0
 		#define		PWM_TIM_Deadtime										100
-	
-	  #define   Setpoint_Min                        24
 /**
  * @}
  */
 
-float vel_left,vel_right;
+float vel_left,vel_right,filtered_speed_left,filtered_speed_right;
 extern float Kp1,Ki1,Kd1,Kp2,Ki2,Kd2;
-MOTOR Motor_1 ={0,0,0,0};
-MOTOR Motor_2 ={0,0,0,0};
+MOTOR Motor_1;
+MOTOR Motor_2;
 CAR Car;
-//PID PID_1={1.0,0.3,0.2,0,0,0,0,0};
-//PID PID_2={1.0,0.3,0.2,0,0,0,0,0};
 
 void Motor_Config(void)
 {
@@ -165,26 +161,17 @@ void PWM_Init(void) {
 	TIM_ARRPreloadConfig(TIM2, ENABLE);
 	TIM_Cmd(TIM2, ENABLE);
 }
-PID PID_1={6,0.5,0.01,0,0,0,0};
-PID PID_2={6,0.5,0.01,0,0,0,0,0};
-//PID PID_1={0,0,0,0,0,0,0};
-//PID PID_2={0,0,0,0,0,0,0,0};
+
+PID PID_1={30,10,0.01,0,0,0,0}; 
+PID PID_2={30,10,0.01,0,0,0,0,0};
 
 void Motor_Control(void)
 {
-//  PID_1.Kd = Kp1;
-//	PID_1.Kd = Ki1;
-//	PID_1.Kd = Kd1;
-//	
-//	PID_2.Kd = Kp2;
-//	PID_2.Kd = Ki2;
-//	PID_2.Kd = Kd2;
-	
 		Motor_1.Output = (Motor_Control_Speed(&PID_1,vel_right,Car.v_right) + 8400)/6; //R
 		Motor_2.Output = (Motor_Control_Speed(&PID_2,vel_left,Car.v_left) + 8400)/6;	//L	
 	
-//	Motor_1.Output = (Motor_Control_Speed(&PID_1,vel_right,40) + 8400)/6; //R
-//	Motor_2.Output = (Motor_Control_Speed(&PID_2,vel_left,40) + 8400)/6;	//L
+//	Motor_1.Output = (Motor_Control_Speed(&PID_1,filtered_speed_right,80) + 8400)/6; //R
+//	Motor_2.Output = (Motor_Control_Speed(&PID_2,filtered_speed_left,30) + 8400)/6;	//L
 	
 	if (PID_1.Output ==0)
 		Motor_1.Output = 0;
@@ -213,8 +200,10 @@ int32_t Motor_Control_Speed(PID* pid, double current,double setpoint)
 	pid->Error  = setpoint-current;
 	pid->P_part = pid->Kp*pid->Error;
 	pid->I_part = 0.5*pid->Ki*T_Sample*(pid->Error + pid->pre_Error);
-	pid->D_part = pid->Kd/T_Sample*( pid->Error - 2*pid->pre_Error+pid->pre_pre_Error);
+	pid->D_part = (pid->Kd*( pid->Error - pid->pre_Error))/T_Sample;
 	pid->Output = pid->pre_Output + pid->P_part + pid->I_part + pid->D_part ;
+	
+	pid->pre_I_part = pid->I_part;
 	pid->pre_pre_Error = pid->pre_Error;
 	pid->pre_Error = pid->Error;
 	

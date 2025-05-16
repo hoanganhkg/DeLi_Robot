@@ -135,13 +135,3 @@ void CAN1_RX0_IRQHandler(void)
 		CAN_ClearITPendingBit(CAN1, CAN_IT_FMP0);
 	}
 }
-
-void CAN_send_package(IMU_send *IMU_CAN)
-{
-	for(int i=0;i<4;i++)
-			{
-				CAN1_Send (0x002,&IMU_CAN->IMU_data_CAN[i*8],8);
-			}
-}	
-
-

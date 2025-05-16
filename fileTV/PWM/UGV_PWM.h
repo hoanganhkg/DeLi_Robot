@@ -40,6 +40,7 @@ typedef struct
 		float Kd; 
 		double P_part;
 		double I_part;
+		double pre_I_part;
 		double D_part;
 		double Error;
 		double pre_Error;

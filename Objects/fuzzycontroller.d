@@ -1,0 +1,9 @@
+.\objects\fuzzycontroller.o: fileTV\FuzzyController.c
+.\objects\fuzzycontroller.o: fileTV\FuzzyController.h
+.\objects\fuzzycontroller.o: C:\Users\buidi\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f407xx.h
+.\objects\fuzzycontroller.o: .\Libraries\CMSIS\Include\core_cm4.h
+.\objects\fuzzycontroller.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\fuzzycontroller.o: .\Libraries\CMSIS\Include\core_cmInstr.h
+.\objects\fuzzycontroller.o: .\Libraries\CMSIS\Include\core_cmFunc.h
+.\objects\fuzzycontroller.o: .\Libraries\CMSIS\Include\core_cmSimd.h
+.\objects\fuzzycontroller.o: C:\Users\buidi\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h

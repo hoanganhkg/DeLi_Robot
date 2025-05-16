@@ -222,7 +222,7 @@ void BNO055_Write_Buffer(uint8_t reg_addr, uint8_t *buffer, uint8_t length) {
 
 // Get heading (yaw) in degrees
 float BNO055_Get_Heading(void) {
-    uint8_t buffer[2];
+ uint8_t buffer[2];
     int16_t heading;
     float heading_degrees;
     
@@ -235,12 +235,12 @@ float BNO055_Get_Heading(void) {
     // Convert to degrees (BNO055 outputs in 1/16 degrees)
     heading_degrees = (float)heading / 16.0f;
 	
-  if (heading > 180.0f)
-        return heading - 360.0f;
+  if (heading_degrees > 180.0f)
+        return heading_degrees - 360.0f;
     else
-        return heading;
+        return heading_degrees;
     
-    return -heading_degrees;
+    return heading_degrees;
 }
 
 // Get roll angle in degrees (-180 to +180)
@@ -466,4 +466,27 @@ void BNO055_ApplyCalibration(const BNO055_Offsets_t *offsets) {
 
 		BNO055_Write_Byte(BNO055_OPR_MODE_ADDR, OPERATION_MODE_NDOF);
 		delay_01ms(200);
+}
+
+void KalmanAngle_Init(KalmanAngle *kf, float Q, float R) {
+    kf->angle = 0.0f;
+    kf->P = 1.0f;
+    kf->Q = Q;  // nhi?u quá trình (m?c d? tin vào giá tr? hi?n t?i)
+    kf->R = R;  // nhi?u do lu?ng (tin vào c?m bi?n)
+}
+
+float KalmanAngle_Update(KalmanAngle *kf, float measured_angle) {
+    // D? doán
+    kf->P += kf->Q;
+
+    // Kalman gain
+    kf->K = kf->P / (kf->P + kf->R);
+
+    // C?p nh?t góc
+    kf->angle += kf->K * (measured_angle - kf->angle);
+
+    // C?p nh?t sai s?
+    kf->P *= (1 - kf->K);
+
+    return kf->angle;
 }

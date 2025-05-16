@@ -161,3 +161,26 @@ void Get_speed()
 	  vel_right=(((double)encoder_right*60)/(1000*0.05));
 		encoder_right=0;
 }	
+
+void KalmanSpeed_Init(KalmanSpeed *kf, float Q, float R) {
+    kf->speed = 0.0f;
+    kf->P = 1.0f;
+    kf->Q = Q;    // Ví d?: 0.01
+    kf->R = R;    // Ví d?: 1.0
+}
+
+float KalmanSpeed_Update(KalmanSpeed *kf, float measured_speed) {
+    // D? doán
+    kf->P += kf->Q;
+
+    // Tính Kalman gain
+    kf->K = kf->P / (kf->P + kf->R);
+
+    // C?p nh?t giá tr? t?c d?
+    kf->speed += kf->K * (measured_speed - kf->speed);
+
+    // C?p nh?t sai s?
+    kf->P = (1 - kf->K) * kf->P;
+
+    return kf->speed;
+}

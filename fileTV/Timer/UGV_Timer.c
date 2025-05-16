@@ -20,7 +20,8 @@ IMU_send CAN_IMU;
 int encoder_left,encoder_right;
 EulerAngles angles;
 BNO055_Data imu_data;
-float heading_real;
+extern float filtered_speed_left,filtered_speed_right;
+float raw_heading,filter_heading;
 /**
 
  * @defgroup Module Pin define
@@ -173,6 +174,8 @@ void TIM5_IRQHandler(void)
 	
 //		Get_ENC_speed(&Motor_1,&Motor_2);
 		Get_speed();
+		filtered_speed_left = KalmanSpeed_Update(&my_kalman_speed, vel_left);
+		filtered_speed_right = KalmanSpeed_Update(&my_kalman_speed, vel_right);
 		Motor_Control();
 		
 		IWDG_ReloadCounter();
@@ -188,20 +191,57 @@ void TIM6_DAC_IRQHandler()
 			TIM_ClearITPendingBit(TIM6, TIM_IT_Update);
 			
 			GPIO_ToggleBits(GPIOD, GPIO_Pin_15); // (LED Blue)
-//      if(packet_count<30)
-//			// Gán giá tr? t?c d? d?ng co
-//			{
-			CAN_Motor_speed.velo[0] = vel_left;   // Gi? s? t?c d? d?ng co trái
-			CAN_Motor_speed.velo[1] = vel_right;   // Gi? s? t?c d? d?ng co ph?i
+
+			CAN_Motor_speed.velo[0] = filtered_speed_left;   // Gi? s? t?c d? d?ng co trái
+			CAN_Motor_speed.velo[1] = filtered_speed_right;   // Gi? s? t?c d? d?ng co ph?i
 		
 			// Gán giá tr? Yaw t? IMU
 //			CAN_IMU.IMU_value[0] = IMU_RQ.Yaw;
-      CAN_IMU.IMU_value[0] = heading_real;
+      CAN_IMU.IMU_value[0] = filter_heading;
 			// G?i d? li?u qua CAN
-			CAN1_Send(CAN_MOTOR_ID, CAN_Motor_speed.vel_data,8);
-			CAN1_Send(CAN_IMU_Yaw_ID, CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte
+			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte
+			
+//			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+//			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte
+//			
+//			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+//			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte			
+//			
+//			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+//			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte
+//			
+//			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+//			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte
+//			
+//			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+//			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte
+//			
+//			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+//			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte
+//			
+//			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+//			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte
+//			
+//			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+//			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte
+//			
+//			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+//			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte			
+//			
+//			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+//			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte
+//			
+//			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+//			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte
+//			
+//			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+//			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte
+//			
+//			CAN1_Send(CAN_MOTOR_ID,CAN_Motor_speed.vel_data,8);
+//			CAN1_Send(CAN_IMU_Yaw_ID,CAN_IMU.IMU_data_CAN,8); // Ch? g?i 4 byte
+			
 			IWDG_ReloadCounter();
-//			packet_count ++;}
 		}
 }
 
@@ -213,14 +253,9 @@ void TIM7_IRQHandler(void)
 	{
 		TIM_ClearITPendingBit(TIMER_CONTROL, TIM_IT_Update);
 		GPIO_ToggleBits(GPIOD, GPIO_Pin_13); // LED ORANGE
-		BNO055_Get_Euler_Angles(&angles.yaw, &angles.roll, &angles.pitch);
-		BNO055_Get_All_Data(&imu_data);
-		heading_real = angles.yaw;
-//		heading_real = angles.yaw - yaw_offset;
-//		getRaw_Accel_Gyro();
-//		getAngle();
-//		IMU.Yaw=IMU_Heading();
-//		Get_IMU_RQ();		
+		
+		raw_heading = BNO055_Get_Heading();
+		filter_heading = KalmanAngle_Update(&kalman_yaw, raw_heading);
 		IWDG_ReloadCounter();
 	}
 }

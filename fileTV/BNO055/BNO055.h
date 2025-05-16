@@ -120,11 +120,21 @@ typedef struct {
     int16_t accel_radius;
     int16_t mag_radius;
 } BNO055_Offsets_t;
+
+typedef struct {
+    float angle;
+    float P;
+    float Q;
+    float R;
+    float K;
+} KalmanAngle;
+
 // Privates variables
 extern float heading;
 extern EulerAngles angles;
 extern BNO055_Data imu_data;
 extern BNO055_Offsets_t calib_data;
+extern KalmanAngle kalman_yaw;
 // Private Function prototypes
 void I2C2_Init(void);
 void delay_ms(uint32_t ms);
@@ -143,5 +153,6 @@ void BNO055_Get_Gravity(float *x, float *y, float *z);
 int8_t BNO055_Get_Temperature(void);
 void BNO055_Get_All_Data(BNO055_Data *data);
 void BNO055_ApplyCalibration(const BNO055_Offsets_t *offsets);
-
+void KalmanAngle_Init(KalmanAngle *kf, float Q, float R);
+float KalmanAngle_Update(KalmanAngle *kf, float measured_angle);
 #endif
