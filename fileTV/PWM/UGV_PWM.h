@@ -19,7 +19,7 @@
  *  												DEFINE  	                                        *
  *  														                                              *
  ******************************************************************************/
-#define T_Sample 		0.05
+#define T_Sample 		0.025
 #define PI 					3.141592654
 #define duty_max 		8399  //8399
 #define duty_min 		-8400  //-8399

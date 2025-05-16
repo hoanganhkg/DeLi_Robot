@@ -30,11 +30,11 @@ float raw_heading,filter_heading;
 		/** 
 		* @brief   Timer Pin define 
 		*/
-		#define		TIMER_MOTOR				 					TIM5 //40ms
+		#define		TIMER_MOTOR				 					TIM5 //25ms
 		#define		TIMER_MOTOR_CLK							RCC_APB1Periph_TIM5
 		#define 	TIMER_MOTOT_CLK_Cmd					RCC_APB1PeriphClockCmd
 		#define		TIMER_MOTOR_Prescaler				8399
-		#define		TIMER_MOTOR_Period					399
+		#define		TIMER_MOTOR_Period					250-1
 		
 		#define		TIMER_TRANSDATA							TIM6 //200ms
 		#define		TIMER_TRANSDATA_CLK					RCC_APB1Periph_TIM6
@@ -245,7 +245,6 @@ void TIM6_DAC_IRQHandler()
 		}
 }
 
-float yaw_offset = -70.6875;
 /*TIMER 7 GET IMU*/
 void TIM7_IRQHandler(void)
 {

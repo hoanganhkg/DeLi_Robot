@@ -29,7 +29,7 @@ int main(void)
   INCP_GPIO_config();
 	INCP_TIMER_CONFIG();
 	INCP_CONFIG();
-	KalmanSpeed_Init(&my_kalman_speed, 10.0f, 0.1f);  // Q và R b?n có th? tinh ch?nh
+	KalmanSpeed_Init(&my_kalman_speed, 10.0f, 0.1f);
 	CAN_Config();
 	I2C2_Init();
 	BNO055_ApplyCalibration(&calib_data);

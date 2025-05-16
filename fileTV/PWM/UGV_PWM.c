@@ -162,16 +162,19 @@ void PWM_Init(void) {
 	TIM_Cmd(TIM2, ENABLE);
 }
 
-PID PID_1={30,10,0.01,0,0,0,0}; 
-PID PID_2={30,10,0.01,0,0,0,0,0};
+//PID PID_1={30,10,0.01,0,0,0,0}; 
+//PID PID_2={30,10,0.01,0,0,0,0,0};
+
+PID PID_1={6,0.09,0.0,0,0,0,0}; 
+PID PID_2={6,0.09,0.0,0,0,0,0,0};
 
 void Motor_Control(void)
 {
 		Motor_1.Output = (Motor_Control_Speed(&PID_1,vel_right,Car.v_right) + 8400)/6; //R
 		Motor_2.Output = (Motor_Control_Speed(&PID_2,vel_left,Car.v_left) + 8400)/6;	//L	
 	
-//	Motor_1.Output = (Motor_Control_Speed(&PID_1,filtered_speed_right,80) + 8400)/6; //R
-//	Motor_2.Output = (Motor_Control_Speed(&PID_2,filtered_speed_left,30) + 8400)/6;	//L
+//	Motor_1.Output = (Motor_Control_Speed(&PID_1,filtered_speed_right,55) + 8400)/6; //R
+//	Motor_2.Output = (Motor_Control_Speed(&PID_2,filtered_speed_left,55) + 8400)/6;	//L
 	
 	if (PID_1.Output ==0)
 		Motor_1.Output = 0;
@@ -192,14 +195,13 @@ void Motor_Control(void)
 	
 //	TIM2->CCR1 = 893; //R
 //	TIM2->CCR2 = 893; //L
-
 }	
 
 int32_t Motor_Control_Speed(PID* pid, double current,double setpoint)
 {
 	pid->Error  = setpoint-current;
 	pid->P_part = pid->Kp*pid->Error;
-	pid->I_part = 0.5*pid->Ki*T_Sample*(pid->Error + pid->pre_Error);
+	pid->I_part = pid->pre_I_part + 0.5*pid->Ki*T_Sample*(pid->Error + pid->pre_Error);
 	pid->D_part = (pid->Kd*( pid->Error - pid->pre_Error))/T_Sample;
 	pid->Output = pid->pre_Output + pid->P_part + pid->I_part + pid->D_part ;
 	

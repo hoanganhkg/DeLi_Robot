@@ -69,7 +69,7 @@ void INCP_TIMER_CONFIG()
 
 	INCPTIM.TIM_ClockDivision=TIM_CKD_DIV1;
 	INCPTIM.TIM_CounterMode=TIM_CounterMode_Up;
-	INCPTIM.TIM_Period=499;
+	INCPTIM.TIM_Period=250-1;
 	INCPTIM.TIM_Prescaler=8399;
 	INCPTIM.TIM_RepetitionCounter=0;
 
@@ -80,7 +80,7 @@ void INCP_TIMER_CONFIG()
 
 	INCPTIM.TIM_ClockDivision=TIM_CKD_DIV1;
 	INCPTIM.TIM_CounterMode=TIM_CounterMode_Up;
-	INCPTIM.TIM_Period=499;
+	INCPTIM.TIM_Period=250-1;
 	INCPTIM.TIM_Prescaler=8399;
 	INCPTIM.TIM_RepetitionCounter=0;
 
@@ -155,10 +155,10 @@ void TIM4_IRQHandler()
 }
 void Get_speed()
 {
-	  vel_left=(((double)encoder_left*60)/(1000*0.05));
+	  vel_left=(((double)encoder_left*60)/(1000*0.025));
 		encoder_left=0;
 	
-	  vel_right=(((double)encoder_right*60)/(1000*0.05));
+	  vel_right=(((double)encoder_right*60)/(1000*0.025));
 		encoder_right=0;
 }	
 
